@@ -24,7 +24,7 @@ Public Class tcpControl
     Public Sub New(byVal localIP As String, byVal ServerPort As Integer)
 
         StartServer(localIP, ServerPort)
-        ActiveCnxMonitorTimer.Interval = 2000
+        ActiveCnxMonitorTimer.Interval = 1000
         ActiveCnxMonitorTimer.Enabled = True
     End Sub
     Function StartServer(byVal localIP As String, byVal ServerPort As Integer)
@@ -105,13 +105,18 @@ Public Class tcpControl
         End Try
     End Sub
 
-    Public Sub SendASTMFrame(byVal astmFrame As String)
+    Public Sub SendASTMFrame(byVal astmFrame As String,ByVal FrameNumber As Integer, location As String, byVal RFDby As String)
         Dim FinalizedAstmFrame As String = FinalizeFrame.ReplaceControlCharacters(astmFrame)
+        'Logging Final frames to Disk
+            Dim file As System.IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\debugastm.txt",True)
+            file.WriteLine(String.Format("{0}  {1}   {2}   {3}",RFDby,location, FrameNumber, astmFrame))
+            file.Close()
 
         For Each c As TcpClient In _listOfClients
             Dim nns As NetworkStream = c.GetStream()
             'nns.Write(Encoding.ASCII.GetBytes(FinalizedAstmFrame), 0, FinalizedAstmFrame.Length)
             nns.Write(Encoding.GetEncoding("ISO-8859-1").GetBytes(FinalizedAstmFrame), 0, FinalizedAstmFrame.Length)
+            'nns.Write(Encoding.GetEncoding("ISO-8859-1").GetBytes(astmFrame), 0, astmFrame.Length)
         Next
     End Sub
 

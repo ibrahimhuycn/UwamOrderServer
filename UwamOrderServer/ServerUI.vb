@@ -44,7 +44,7 @@ Public Class ServerUI
         ' This call is required by the designer.
         InitializeComponent()
 
-        InititiateNewSampleTransmitTimer.Interval = 500
+        InititiateNewSampleTransmitTimer.Interval = 10
         InititiateNewSampleTransmitTimer.Enabled=True
         Erase OrderReadySampleNumbers
 
@@ -265,7 +265,7 @@ Public Class ServerUI
         UpdateGridView(DataGridView1, row)
 
         'Send Next frame
-        TransmitFrame(ReasonForTransmit.OnACK)
+        TransmitFrame(ReasonForTransmit.OnACK, "WAM.ACK")
     End Sub
 
     Private Sub DataGridView1_RowsAdded(sender As Object, e As DataGridViewRowsAddedEventArgs) Handles DataGridView1.RowsAdded
@@ -289,7 +289,7 @@ Public Class ServerUI
         row.Cells.Add(New DataGridViewTextBoxCell With {.Value = receivedMsg.ToString})
         DisplaySeq += 1
         UpdateGridView(DataGridView1, row)
-        TransmitFrame(ReasonForTransmit.onNAK)
+        TransmitFrame(ReasonForTransmit.onNAK, "WAM.NAK")
     End Sub
     Sub PopulateLog(sender As tcpControl, LogItem As String) Handles Server.PopulateLog, Me.TabulateSentOrders
         ' MsgBox ("PopulateLog raised")
@@ -333,8 +333,19 @@ Public Class ServerUI
                 DataGridview1.ResumeLayout
                 Erase OrderReadySampleNumbers
 
+                Dim Counter As Integer = 0
+                Do While Counter < SampleOrderFrames.Count
+                
+                        Dim file As System.IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\debugastm_CACHE.txt", True)
+                        file.WriteLine(SampleOrderFrames.Item(Counter)._Frame)
+                        Counter +=1
+                        file.Close()
+
+           
+                Loop
+
                 'ENABLE THE BUTTON
-                TransmitFrame(ReasonForTransmit.NewFrame)
+                TransmitFrame(ReasonForTransmit.NewFrame, "ORD.NEW")
                 btnSendOrders.Enabled = True
 
             Else
@@ -347,13 +358,13 @@ Public Class ServerUI
         End If
     End Sub
 
-    Private sub TransmitFrame(Reason As ReasonForTransmit)
+    Private sub TransmitFrame(Reason As ReasonForTransmit, RFDby As string)
         If Not LastFrameTransmitted = SampleOrderFrames.Count Then
 
             RaiseEvent NoOrdersTransmitted(Server, LastFrameTransmitted, SampleOrderFrames.Count)
             Select Case Reason
                 Case ReasonForTransmit.NewFrame
-                    Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted)._Frame)
+                    Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted)._Frame, LastFrameTransmitted, "NEW", RFDby)
                     RaiseEvent TabulateSentOrders(Server, SampleOrderFrames.Item(LastFrameTransmitted)._Frame)
                     LastFrameTransmitted = LastFrameTransmitted + 1
       
@@ -368,32 +379,30 @@ Public Class ServerUI
                         Exit Sub
                     End If
 
-                    Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted)._Frame)
-                    RaiseEvent TabulateSentOrders(Server, SampleOrderFrames.Item(LastFrameTransmitted)._Frame)
-                    RaiseEvent NoOrdersTransmitted(Server, LastFrameTransmitted, SampleOrderFrames.Count)
-
-
                     If SampleOrderFrames.Item(LastFrameTransmitted)._Frame = "<EOT>" Then
+                        Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted)._Frame, LastFrameTransmitted, "ACK", RFDby)
                         LastFrameTransmitted = LastFrameTransmitted + 1
                         RaiseEvent NoOrdersTransmitted(Server, LastFrameTransmitted, SampleOrderFrames.Count)
+                        RaiseEvent TabulateSentOrders(Server, SampleOrderFrames.Item(LastFrameTransmitted - 1)._Frame)
                         StartTransmit = ReasonForTransmit.InitiateTransmitNextSample
                         Exit Sub
                     Else
+                        Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted)._Frame, LastFrameTransmitted, "ACK", RFDby)
                         LastFrameTransmitted = LastFrameTransmitted + 1
+                        RaiseEvent TabulateSentOrders(Server, SampleOrderFrames.Item(LastFrameTransmitted-1)._Frame)
+                        RaiseEvent NoOrdersTransmitted(Server, LastFrameTransmitted, SampleOrderFrames.Count)
+                        
                     End If
-
-                    'UPDATE THE PROGRESS BAR
-
 
                 Case ReasonForTransmit.onNAK
                     If CountNAK < 5 Then
-                        Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted-1)._Frame)
+                        Server.SendASTMFrame(SampleOrderFrames.Item(LastFrameTransmitted-1)._Frame, LastFrameTransmitted, "NAK",RFDby)
                         RaiseEvent TabulateSentOrders(Server, SampleOrderFrames.Item(LastFrameTransmitted-1)._Frame & CountNAK.ToString)
                         CountNAK = CountNAK + 1
                         RaiseEvent NoOrdersTransmitted(Server, LastFrameTransmitted, SampleOrderFrames.Count)
 
                     Else
-                        Server.SendASTMFrame("<EOT>")
+                        Server.SendASTMFrame("<EOT>", LastFrameTransmitted, "NA1", RFDby)
                         'TODO: CREATE A SAVE POINT OF SOME SORT SO THAT FAILED ORDER FOR THE SAMPLE NUMBER WILL START TRANSMISSION FROM <ENQ> 
                         RaiseEvent TabulateSentOrders(Server, "<EOT>")
                         CountNAK = 0
@@ -419,11 +428,8 @@ Public Class ServerUI
 
     Private Sub InititiateNewSampleTransmitTimer_Elapsed(sender As Object, e As ElapsedEventArgs) Handles InititiateNewSampleTransmitTimer.Elapsed
         If StartTransmit = ReasonForTransmit.InitiateTransmitNextSample Then
-            TransmitFrame(ReasonForTransmit.InitiateTransmitNextSample)
             StartTransmit = ReasonForTransmit.DoNotInitiateTransmitNextSample
-
-
-
+            TransmitFrame(ReasonForTransmit.InitiateTransmitNextSample, "TIM.NXT")
         End If
     End Sub
 
