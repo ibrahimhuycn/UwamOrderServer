@@ -333,17 +333,6 @@ Public Class ServerUI
                 DataGridview1.ResumeLayout
                 Erase OrderReadySampleNumbers
 
-                Dim Counter As Integer = 0
-                Do While Counter < SampleOrderFrames.Count
-                
-                        Dim file As System.IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\debugastm_CACHE.txt", True)
-                        file.WriteLine(SampleOrderFrames.Item(Counter)._Frame)
-                        Counter +=1
-                        file.Close()
-
-           
-                Loop
-
                 'ENABLE THE BUTTON
                 TransmitFrame(ReasonForTransmit.NewFrame, "ORD.NEW")
                 btnSendOrders.Enabled = True
