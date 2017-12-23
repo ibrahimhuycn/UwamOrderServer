@@ -246,8 +246,8 @@ Public Class ServerUI
 
     Private Sub btnStartServer_Click(sender As Object, e As EventArgs) Handles btnStartServer.Click
         Try
-            'Server = New tcpControl("10.0.110.168", 40001)      'FOR DEPLOYMENT
-            Server = New tcpControl("192.168.1.2", 40001)      'FOR DEVELOPMENT
+            Server = New tcpControl("10.0.110.168", 40001)      'FOR DEPLOYMENT
+            'Server = New tcpControl("192.168.1.2", 40001)      'FOR DEVELOPMENT
             'Handlers for custom Events Raised by tcpControl.
             btnStartServer.Enabled = False
         Catch ex As Exception
