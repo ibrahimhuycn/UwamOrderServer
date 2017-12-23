@@ -44,7 +44,7 @@ Public Class ServerUI
         ' This call is required by the designer.
         InitializeComponent()
 
-        InititiateNewSampleTransmitTimer.Interval = 250
+        InititiateNewSampleTransmitTimer.Interval = 500
         InititiateNewSampleTransmitTimer.Enabled=True
         Erase OrderReadySampleNumbers
 
@@ -158,7 +158,7 @@ Public Class ServerUI
             'OPEN DIALOG AND STORES ALL EPIDSODE NUMBERS IN ARRAY
             If OpenOrdersFile.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 EpisodeNo = File.ReadAllLines(OpenOrdersFile.FileName)
-            ElseIf OpenOrdersFile.ShowDialog() = System.Windows.Forms.DialogResult.Cancel Then
+            ElseIf DialogResult.Cancel Then
                 Exit Sub
             End If
         Catch ex As Exception
@@ -327,9 +327,8 @@ Public Class ServerUI
                         'server.SendASTMFrame(astmmessage)
                         SampleOrderFrames.Add(New ASTM.astmFramesCurrentOrder(astmmessage))
                     Next
-
+         
                     msgCounter += 1
-
                 Next
                 DataGridview1.ResumeLayout
                 Erase OrderReadySampleNumbers
