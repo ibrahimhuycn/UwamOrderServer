@@ -28,6 +28,9 @@ Partial Class ServerUI
         Me.OpenOrdersFile = New System.Windows.Forms.OpenFileDialog()
         Me.lblProgress = New System.Windows.Forms.Label()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.ColSerial = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colDateTime = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colLog = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.gbServerLogs = New System.Windows.Forms.GroupBox()
         Me.btnStartServer = New System.Windows.Forms.Button()
         Me.GroupBoxServerStatus = New System.Windows.Forms.GroupBox()
@@ -39,9 +42,6 @@ Partial Class ServerUI
         Me.PictureBoxNotConected = New System.Windows.Forms.PictureBox()
         Me.PictureBoxConnected = New System.Windows.Forms.PictureBox()
         Me.PictureBoxServerOffline = New System.Windows.Forms.PictureBox()
-        Me.ColSerial = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.colDateTime = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.colLog = New System.Windows.Forms.DataGridViewTextBoxColumn()
         CType(Me.DataGridView1,System.ComponentModel.ISupportInitialize).BeginInit
         Me.gbServerLogs.SuspendLayout
         Me.GroupBoxServerStatus.SuspendLayout
@@ -95,6 +95,28 @@ Partial Class ServerUI
         Me.DataGridView1.ReadOnly = true
         Me.DataGridView1.Size = New System.Drawing.Size(649, 162)
         Me.DataGridView1.TabIndex = 5
+        '
+        'ColSerial
+        '
+        Me.ColSerial.HeaderText = "#"
+        Me.ColSerial.Name = "ColSerial"
+        Me.ColSerial.ReadOnly = true
+        Me.ColSerial.Width = 50
+        '
+        'colDateTime
+        '
+        Me.colDateTime.HeaderText = "Date"
+        Me.colDateTime.Name = "colDateTime"
+        Me.colDateTime.ReadOnly = true
+        Me.colDateTime.Width = 130
+        '
+        'colLog
+        '
+        Me.colLog.HeaderText = "Log"
+        Me.colLog.Name = "colLog"
+        Me.colLog.ReadOnly = true
+        Me.colLog.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.colLog.Width = 400
         '
         'gbServerLogs
         '
@@ -204,28 +226,6 @@ Partial Class ServerUI
         Me.PictureBoxServerOffline.TabIndex = 14
         Me.PictureBoxServerOffline.TabStop = false
         '
-        'ColSerial
-        '
-        Me.ColSerial.HeaderText = "#"
-        Me.ColSerial.Name = "ColSerial"
-        Me.ColSerial.ReadOnly = true
-        Me.ColSerial.Width = 50
-        '
-        'colDateTime
-        '
-        Me.colDateTime.HeaderText = "Date"
-        Me.colDateTime.Name = "colDateTime"
-        Me.colDateTime.ReadOnly = true
-        Me.colDateTime.Width = 130
-        '
-        'colLog
-        '
-        Me.colLog.HeaderText = "Log"
-        Me.colLog.Name = "colLog"
-        Me.colLog.ReadOnly = true
-        Me.colLog.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colLog.Width = 400
-        '
         'ServerUI
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7!, 14!)
@@ -243,6 +243,7 @@ Partial Class ServerUI
         Me.Controls.Add(Me.btnSendOrders)
         Me.Font = New System.Drawing.Font("Cambria", 9!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
+        Me.Icon = CType(resources.GetObject("$this.Icon"),System.Drawing.Icon)
         Me.MaximizeBox = false
         Me.Name = "ServerUI"
         Me.Text = "UWAM Analysis Server"
