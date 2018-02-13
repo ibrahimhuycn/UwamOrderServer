@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.ComponentModel
 Imports System.Timers
 
@@ -130,14 +130,21 @@ Public Class ServerUI
         End If
     End Sub
 
+        ''' <summary>
+        ''' Initialize form on Load. Sets lblProgress.Text & lblNoClients.Text values to their defaults.
+        ''' </summary>
+
     Private Sub ServerUI_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         lblProgress.Text = String.Format("No. Analysis orders: {0}", 0)
         lblNoClients.Text = "Number of Connections: 0"
     End Sub
 
+        ''' <summary>
+        ''' Called to maintain an incremental count of valid sample numbers indicating total number of sample number read from Orders.text file
+        ''' </summary>
+        ''' <param name="IsSample">Variable specifing whether the string read was a valid sample number.</param>
     Public Sub MaintainActualRecordCount(IsSample As Boolean)
-
 
         Select Case IsSample
             Case True
@@ -150,6 +157,10 @@ Public Class ServerUI
 
     End Sub
 
+        ''' <summary>
+        ''' Reads episode numbers from disk, validates them, calls MaintainActualRecordCount to maintain actual sample count.
+        ''' Adds sample Numbers to OrderReadySampleNumbers Array to be used to generate ASTM orders records
+        ''' </summary>
     Private Sub BtnImportOrdes_Click(sender As Object, e As EventArgs) Handles BtnImportOrders.Click
         'ARRAY TO STORE ALL EPISODE NUMBERS FROM TEXT FILE.
         Dim EpisodeNo() As String = Nothing
@@ -204,9 +215,6 @@ Public Class ServerUI
                 End Select
                 counter += 1
 
-
-
-
             Next
 
         End If
@@ -230,6 +238,12 @@ Public Class ServerUI
         'DISPLAY THE NUMBER OF SAMPLE NUMBERS IN ARRAY
         lblProgress.Text = String.Format("No. Analysis orders: {0}", ActualSampleNoCount)
     End Sub
+
+        ''' <summary>
+        ''' Updates and sorts with the dataField provided by using the Delegate UpdateGridView, gets DisplaySeq from variable and DateTime from system
+        ''' DisplaySeq is the total number of rows in the DataGridView and is used to sort the UpdateGridView 
+        ''' </summary>
+        ''' <param name="dataField">Information displayed in DataGridView, could be an error message, sent frames, received frames, etc...</param>
     Public Sub PopulateLog(byVal dataField as String)
         Dim Row As New Datagridviewrow
 
@@ -246,8 +260,8 @@ Public Class ServerUI
 
     Private Sub btnStartServer_Click(sender As Object, e As EventArgs) Handles btnStartServer.Click
         Try
-            Server = New tcpControl("10.0.110.168", 40001)      'FOR DEPLOYMENT
-            'Server = New tcpControl("192.168.1.2", 40001)      'FOR DEVELOPMENT
+            'Server = New tcpControl("10.0.110.168", 40001)      'FOR DEPLOYMENT
+            Server = New tcpControl("192.168.1.2", 40001)      'FOR DEVELOPMENT
             'Handlers for custom Events Raised by tcpControl.
             btnStartServer.Enabled = False
         Catch ex As Exception
@@ -302,8 +316,13 @@ Public Class ServerUI
         UpdateGridView(DataGridView1, row)
     End Sub
 
+        ''' <summary>
+        ''' Generates ASTM messages with ASTMProcessor.GenMessageASTM and calls TransmitFrame to send orders to analyser.
+        ''' </summary>
     Private Sub btnSendOrders_Click(sender As Object, e As EventArgs) Handles btnSendOrders.Click
+            'CHECKING FOR PRESENCE OF NEWLY IMPORTED SAMPLE NUMBERS FOR WHICH ORDERS NEEDS TO BE SENT
         If OrderReadySampleNumbers IsNot Nothing Then
+            'VERIFIYING THAT ANALYSER IS CONNECTED.
             If lastDetectedNoCnx > 0 Then
                 'DISABLE THE BUTTON TO AVOID MULIPLE CLICKS
                 btnSendOrders.Enabled = False
@@ -315,15 +334,14 @@ Public Class ServerUI
                 LastFrameTransmitted = 0
                 ActualSampleNoCount = 0
 
-                'CALCULATE CHECK SUM.
                 DataGridview1.SuspendLayout
                 Dim msgCounter As Integer = 1
-                Dim ASTM_MESSAGES(13) as string
+                Dim ASTM_MESSAGES(13) as string     'ARRAY TO HOLD THE COMPLETE ASTM MESSAGE FROM <ENQ> TO <EOT> FOR CHEMISTRY AND DEPOSIT.
                 For each samplenumber In OrderReadySampleNumbers
-                    ASTM_MESSAGES = ASTMProcessor.GenMessageASTM(samplenumber)
+                    ASTM_MESSAGES = ASTMProcessor.GenMessageASTM(samplenumber)      'GENERATE CHEMISTRY AND DEPOSIT ORDER FRAMES BY PROVIDING SAMPLE NUMBER. ASSIGN THEM TO ASTM_MESSAGES ARRAY
 
+                    'ITERATING THROUGH ASTM_MESSAGES ARRAY AND ADDING THE FRAMES TO A GENERIC LIST SO THAT ASTM_MESSAGES ARRAY IS AVAILABLE TO STORE A NEW SET OF FRAMES FOR THE NEXT SAMPLE NUMBER.
                     For Each astmmessage In ASTM_MESSAGES
-
                         'server.SendASTMFrame(astmmessage)
                         SampleOrderFrames.Add(New ASTM.astmFramesCurrentOrder(astmmessage))
                     Next
@@ -331,10 +349,10 @@ Public Class ServerUI
                     msgCounter += 1
                 Next
                 DataGridview1.ResumeLayout
-                Erase OrderReadySampleNumbers
+                Erase OrderReadySampleNumbers     'OrderReadySampleNumbers ARRAY BEING ERASED AFTER GENERATING ASTM MESSAGES FOR THE SAMPLES.
 
                 'ENABLE THE BUTTON
-                TransmitFrame(ReasonForTransmit.NewFrame, "ORD.NEW")
+                TransmitFrame(ReasonForTransmit.NewFrame, "ORD.NEW")    'CALLING THE FUNCTION TO TRANSMIT THE GENERATED ASTM FRAMES TO ANALYSER.
                 btnSendOrders.Enabled = True
 
             Else
