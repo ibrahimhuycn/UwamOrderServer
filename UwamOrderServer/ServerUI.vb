@@ -126,7 +126,7 @@ Public Class ServerUI
         If lbl.InvokeRequired Then
             lbl.Invoke(New NoSamplesSent(AddressOf NumberSamplesSent), New Object() {lbl, NoTransmitted, TotalNumber})
             Else
-            lbl.Text = String.Format("Orders Sent: {0} of {1}", NoTransmitted, TotalNumber / 14)
+            lbl.Text = String.Format("Orders Sent: {0} of {1}", NoTransmitted, TotalNumber / 7)
         End If
     End Sub
 
@@ -336,7 +336,7 @@ Public Class ServerUI
 
                 DataGridview1.SuspendLayout
                 Dim msgCounter As Integer = 1
-                Dim ASTM_MESSAGES(13) as string     'ARRAY TO HOLD THE COMPLETE ASTM MESSAGE FROM <ENQ> TO <EOT> FOR CHEMISTRY AND DEPOSIT.
+                Dim ASTM_MESSAGES(6) as string     'ARRAY TO HOLD THE COMPLETE ASTM MESSAGE FROM <ENQ> TO <EOT> FOR CHEMISTRY AND DEPOSIT.
                 For each samplenumber In OrderReadySampleNumbers
                     ASTM_MESSAGES = ASTMProcessor.GenMessageASTM(samplenumber)      'GENERATE CHEMISTRY AND DEPOSIT ORDER FRAMES BY PROVIDING SAMPLE NUMBER. ASSIGN THEM TO ASTM_MESSAGES ARRAY
 
@@ -459,7 +459,7 @@ Public Class ServerUI
     Sub NoSamplesTransmitted(Sender As tcpControl , ByVal LastFrame As Integer, byVal TotalFrames As Integer) Handles Me.NoOrdersTransmitted
 
         'COUNT NUMBER OF SAMPLES ORDERS SENT.
-        Dim NumberSampleOrdersTransmitted As Integer = LastFrame \ 14
+        Dim NumberSampleOrdersTransmitted As Integer = LastFrame \ 7
         NumberSamplesSent(lblProgress, NumberSampleOrdersTransmitted, TotalFrames)
         RaiseEvent VisualProgress(Server, (LastFrame / TotalFrames) * 100)
 

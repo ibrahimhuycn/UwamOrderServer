@@ -1,4 +1,4 @@
-﻿Imports System.Net
+Imports System.Net
 Imports System.Text
 Imports System.Net.Sockets
 Imports System.Threading
@@ -85,7 +85,7 @@ Public Class tcpControl
                         RaiseEvent onEOT(ME)
                         MsgBox("EOT")
                     Else
-                        'RaiseEvent onASTMMessage(Me, astmReply)
+                        RaiseEvent onASTMMessage(Me, astmReply)
                     End If
 
 
@@ -110,11 +110,11 @@ Public Class tcpControl
 
 
         'BYPASS LOGGING
-        Dim DEBUG As Boolean =TRUE
+        Const DEBUG As Boolean =TRUE
         If DEBUG = True
             'Logging Final frames to Disk
-            'Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\astmDebug.txt", True)    'DEBUGGING
-            Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("D:\Debug\astmDebug.txt", True)    'DEPLOYMENT
+            Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\astmDebug.txt", True)    'DEBUGGING
+            'Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("D:\Debug\astmDebug.txt", True)    'DEPLOYMENT
             file.WriteLine(String.Format("{0}  {1}   {2}   {3}   {4}", DateTime.Now, RFDby, location, FrameNumber, astmFrame))
             file.Close()
         End If

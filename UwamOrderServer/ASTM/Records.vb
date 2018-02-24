@@ -84,8 +84,8 @@ Namespace ASTM
             Dim receiver As String = Nothing            'Not Used
             Dim comments As String = Nothing            'Not Used
             Dim processing_id As Integer = Nothing      'Not Used
-            Const version0 As String = "E1394-97"       'Either Used, Not Sure
-            Const version1 As String = "LIS2-A2"        'Either Used, Not Sure
+            Const version0 As String = "E1394-97"       'Not Used
+            Const version1 As String = "LIS2-A2"        '
             Dim timestamp As DateTime = Nothing         'Date and time of message format is fixed with “YYYYMMDDHHMMSS”
 
             return 0

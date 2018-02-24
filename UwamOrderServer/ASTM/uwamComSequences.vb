@@ -2,26 +2,26 @@
 Namespace ASTM
 
     Public Class uwamComSequences
-        Private TemplateFramesASTM(13) as String
+        Private TemplateFramesASTM(6) as String
         Public Sub New()
             'Maximum characters per frame: 240
             'ASTM templates for U-WAM
             'CHEMISTRY
+            'TemplateFramesASTM(0) = "<ENQ>"
+           ' TemplateFramesASTM(1) = "<STX>{FNo}H|\^&|||PATH.CLINICAL||||||||LIS2-A2<CR><ETX><CHK1><CHK2><CR><LF>"
+            'TemplateFramesASTM(2) = "<STX>{FNo}P|{seq}||{patient_id}||||{DOB}|U||||||||||||||||<CR><ETX><CHK1><CHK2><CR><LF>"
+            'TemplateFramesASTM(3) = "<STX>{FNo}O|{seq}|{SampleNumber}||^^^URO\^^^BLD\^^^BIL\^^^KET\^^^GLU\^^^PRO\^^^PH\^^^NIT\^^^LEU\^^^CRE\^^^ALB\^^^S.G.(Ref)\^^^COLOR\^^^ColorRANK\^^^CLOUD\|R||{YYYYMMDDHHmmss}||||N||||Urine|||{OrderNo}||<ETB><CHK1><CHK2><CR><LF>"
+            'TemplateFramesASTM(4) = "<STX>{FNo}|||||O|||||C00001^PATH.CLINICAL<CR><ETX><CHK1><CHK2><CR><LF>"
+           ' TemplateFramesASTM(5) = "<STX>{FNo}L|1|N<CR><ETX><CHK1><CHK2><CR><LF>"
+            'TemplateFramesASTM(6) = "<EOT>"
+            'DEPOSIT
             TemplateFramesASTM(0) = "<ENQ>"
-            TemplateFramesASTM(1) = "<STX>{FNo}H|¥^&|||PATH.CLINICAL||||||||LIS2-A2<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(2) = "<STX>{FNo}P|{seq}||{patient_id}||||{DOB}|U||||||||||||||||<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(3) = "<STX>{FNo}O|{seq}|{SampleNumber}||^^^URO¥^^^BLD¥^^^BIL¥^^^KET¥^^^GLU¥^^^PRO¥^^^PH¥^^^NIT¥^^^LEU¥^^^CRE¥^^^ALB¥^^^S.G.(Ref)¥^^^COLOR¥^^^ColorRANK¥^^^CLOUD¥|R||{YYYYMMDDHHmmss}||||N||||Urine|||{OrderNo}||<ETB><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(4) = "<STX>{FNo}|||||O|||||C00001^PATH.CLINICAL<CR><ETX><CHK1><CHK2><CR><LF>"
+            TemplateFramesASTM(1) = "<STX>{FNo}H|\^&|||PATH.CLINICAL||||||||LIS2-A2<CR><ETX><CHK1><CHK2><CR><LF>"
+            TemplateFramesASTM(2) = "<STX>{FNo}P|{seq}||{patient_id}||||{DOB}|U<CR><ETX><CHK1><CHK2><CR><LF>"
+            TemplateFramesASTM(3) = "<STX>{FNo}O|{seq}|{SampleNumber}||^^^RBC\^^^WBC\^^^WBC Clumps\^^^EC\^^^Squa.EC\^^^NonSEC\^^^CAST\^^^Hy.CAST\^^^Path.CAST\^^^BACT\^^^X'TAL\^^^YLC\^^^SPERM\^^^MUCUS\|R||{YYYYMMDDHHmmss}||||N||||Urine||<ETB><CHK1><CHK2><CR><LF>"
+            TemplateFramesASTM(4) = "<STX>{FNo}|{OrderNo}|||||||O|||||C00001^PATH.CLINICAL<CR><ETX><CHK1><CHK2><CR><LF>"
             TemplateFramesASTM(5) = "<STX>{FNo}L|1|N<CR><ETX><CHK1><CHK2><CR><LF>"
             TemplateFramesASTM(6) = "<EOT>"
-            'DEPOSIT
-            TemplateFramesASTM(7) = "<ENQ>"
-            TemplateFramesASTM(8) = "<STX>{FNo}H|¥^&|||PATH.CLINICAL||||||||LIS2-A2<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(9) = "<STX>{FNo}P|{seq}||{patient_id}||||{DOB}|U||||||||||||||||<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(10) = "<STX>{FNo}O|{seq}|{SampleNumber}||^^^RBC¥^^^WBC¥^^^WBC Clumps¥^^^EC¥^^^Squa.EC¥^^^NonSEC¥^^^CAST¥^^^Hy.CAST¥^^^Path.CAST¥^^^BACT¥^^^X'TAL¥^^^YLC¥^^^SPERM¥^^^MUCUS¥|R||{YYYYMMDDHHmmss}||||N||||Urine||<ETB><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(11) = "<STX>{FNo}|{OrderNo}|||||||O|||||C00001^PATH.CLINICAL<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(12) = "<STX>{FNo}L|1|N<CR><ETX><CHK1><CHK2><CR><LF>"
-            TemplateFramesASTM(13) = "<EOT>"
         End Sub
 
         ''' <summary>
@@ -32,7 +32,7 @@ Namespace ASTM
         Public Function GenMessageASTM(byVal SampleNumber As String)
             Dim LoopCounter As Integer = 0
             Dim seq As Integer = 1 
-            Dim ReplacedMessageASTM(13) as String 
+            Dim ReplacedMessageASTM(6) as String 
             Dim FrameNumber As Integer  = 1
             Dim DOB As String = vbNull
             Dim EmulatedPatientID As String = Date.Now.ToString("HHmmssfff")
