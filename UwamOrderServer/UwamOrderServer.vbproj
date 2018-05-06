@@ -105,6 +105,12 @@
     <Compile Include="ASTM\Diagnosis\DiseaseCodes.vb" />
     <Compile Include="ASTM\Records.vb" />
     <Compile Include="ASTM\uwamComSequences.vb" />
+    <Compile Include="ServerConfiguration.Designer.vb">
+      <DependentUpon>ServerConfiguration.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ServerConfiguration.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ServerUI.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -130,11 +136,14 @@
     <Compile Include="tcpControl.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ServerConfiguration.resx">
+      <DependentUpon>ServerConfiguration.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ServerUI.resx">
       <DependentUpon>ServerUI.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <Generator>PublicVbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
@@ -155,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Rade8-Minium-2-Folder-Developer.ico" />
+    <None Include="Resources\gear_edit.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

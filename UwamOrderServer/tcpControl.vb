@@ -6,28 +6,37 @@ Imports UwamOrderServer.ASTM.astmConstants
 Imports System.Timers
 
 Public Class tcpControl
+
     Public Event onASTMMessage(sender As tcpControl, Data As String)
+
     Public Event onACK(sender As tcpControl, ReceivedMsg As String)
+
     Public Event onNAK(sender As tcpControl, ReceivedMsg As String)
+
+    Public Event onENQ(sender As tcpControl, ReceivedMsg As String)
+
     Public Event onEOT(sender As tcpControl)
+
     'Public Event deltaClientCnxNo(sender As tcpControl, CnxNo As Integer)
     Public Event PopulateLog(Sender As tcpControl, LogItem As String)
+
     Public Event CnxMonitor(Sender As tcpControl, localEndPoint As String, ServerStatus As String, CnxNo As Integer)
+
     Public WithEvents ActiveCnxMonitorTimer As New Timers.Timer
 
     Dim FinalizeFrame As New ASTM.uwamComSequences
     Dim _server As TcpListener
     Dim _listOfClients As New List(Of TcpClient)
 
+    Dim IsServerStarted As Boolean
 
-
-    Public Sub New(byVal localIP As String, byVal ServerPort As Integer)
-
+    Public Sub New(ByVal localIP As String, ByVal ServerPort As Integer)
         StartServer(localIP, ServerPort)
         ActiveCnxMonitorTimer.Interval = 100
         ActiveCnxMonitorTimer.Enabled = True
     End Sub
-    Function StartServer(byVal localIP As String, byVal ServerPort As Integer)
+
+    Function StartServer(ByVal localIP As String, ByVal ServerPort As Integer)
         Try
             _server = New TcpListener(IPAddress.Parse(localIP), ServerPort)
             _server.Start()
@@ -35,6 +44,7 @@ Public Class tcpControl
             MsgBox(String.Format("Server Started{0}Listening on {1}:{2}", vbCrLf, localIP, ServerPort))
             'RaiseEvent PopulateLog(Me, "Server Started")
             ThreadPool.QueueUserWorkItem(AddressOf NewClient)
+            IsServerStarted = True
             Return 0
         Catch ex As Exception
             ' RaiseEvent PopulateLog(Me, "Server Started")
@@ -42,6 +52,7 @@ Public Class tcpControl
         End Try
 
     End Function
+
     Private Sub NewClient(state As Object)
 
         If _listOfClients.Count = 0 Then
@@ -77,20 +88,21 @@ Public Class tcpControl
 
                     If astmReply = ChrW(ACK) Then
                         RaiseEvent onACK(Me, "<ACK>")
-                    ElseIf astmReply = ChrW(NAK) then
+                    ElseIf astmReply = ChrW(NAK) Then
                         RaiseEvent onNAK(Me, "<NAK>")
-                    Elseif astmReply = ChrW(ENQ) then
-
-                    ElseIf astmReply = ChrW(EOT) then
-                        RaiseEvent onEOT(ME)
+                    ElseIf astmReply = ChrW(ENQ) Then
+                        RaiseEvent onENQ(Me, "<ENQ>")
+                        SendASTMFrame("<ACK>", 0, "ENQ Received", "ASTM reply on ENQ")
+                    ElseIf astmReply = ChrW(EOT) Then
+                        RaiseEvent onEOT(Me)
                         MsgBox("EOT")
                     Else
+                        'Sending an ACK on each message
+                        SendASTMFrame("<ACK>", 0, "ENQ Received", "ASTM reply on ENQ")
                         RaiseEvent onASTMMessage(Me, astmReply)
                     End If
 
-
                 End If
-
 
             End While
         Catch ex As Exception
@@ -99,26 +111,22 @@ Public Class tcpControl
 
             End If
             RaiseEvent PopulateLog(Me, ex.Message)
-            
         Finally
             ActiveCnxMonitorTimer.Enabled = True
         End Try
     End Sub
 
-    Public Sub SendASTMFrame(byVal astmFrame As String,ByVal FrameNumber As Integer, location As String, byVal RFDby As String)
+    Public Sub SendASTMFrame(ByVal astmFrame As String, ByVal FrameNumber As Integer, location As String, ByVal RFDby As String)
         Dim FinalizedAstmFrame As String = FinalizeFrame.ReplaceControlCharacters(astmFrame)
 
-
         'BYPASS LOGGING
-        Const DEBUG As Boolean =TRUE
-        If DEBUG = True
+        Const DEBUG As Boolean = True
+        If DEBUG = True Then
             'Logging Final frames to Disk
-            Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("E:\astmDebug.txt", True)    'DEBUGGING
-            'Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter("D:\Debug\astmDebug.txt", True)    'DEPLOYMENT
+            Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter(Application.StartupPath() & "\astmDebug.txt", True)
             file.WriteLine(String.Format("{0}  {1}   {2}   {3}   {4}", DateTime.Now, RFDby, location, FrameNumber, astmFrame))
             file.Close()
         End If
-
 
         For Each c As TcpClient In _listOfClients
             Dim nns As NetworkStream = c.GetStream()
@@ -133,12 +141,11 @@ Public Class tcpControl
 
         If _listOfClients.Count > 0 Then
             RaiseEvent CnxMonitor(Me, _server.LocalEndpoint.ToString, "Connected, Listening", _listOfClients.Count)
-
         Else
             RaiseEvent CnxMonitor(Me, _server.LocalEndpoint.ToString, "Listening", _listOfClients.Count)
 
-        End If 
-       
-    End Sub
-End Class
+        End If
 
+    End Sub
+
+End Class
