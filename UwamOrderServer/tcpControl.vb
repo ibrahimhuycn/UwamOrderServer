@@ -147,5 +147,10 @@ Public Class tcpControl
         End If
 
     End Sub
-
+    'TODO: Move the WriteApplicationLog Sub to another class. Add Log4Net to the project and handle logging better.
+    Public Sub WriteApplicationLog(sender As Object,ByVal writeLine As string)
+            Dim file As IO.StreamWriter = My.Computer.FileSystem.OpenTextFileWriter(Application.StartupPath() & "\astmDebug.txt", True)
+            file.WriteLine(String.Format("{0}  {1}   {2}", DateTime.Now, Sender.ToString, writeLine))
+            file.Close()
+    End Sub
 End Class
